@@ -61,7 +61,7 @@ OUTPUT_FILENAME = "equations.txt"
 ACCENT       = "#1a73e8"
 ACCENT_HOVER = "#1558b0"
 SIDEBAR_BG   = ("#1e1e2e", "#1e1e2e")   # dark / light
-CARD_BG      = ("#2a2a3e", "#f0f0f8")
+CARD_BG      = ("#f0f0f8", "#2a2a3e")
 
 
 # ── Datei-Logik (kein UI) ────────────────────────────────────────────────────
@@ -328,7 +328,7 @@ class InputCard(ctk.CTkFrame):
             anchor="w",
         ).grid(row=0, column=0, padx=24, pady=(20, 8), sticky="w")
 
-        ctk.CTkFrame(self, height=1, fg_color=("gray70", "gray40")).grid(
+        ctk.CTkFrame(self, height=1, fg_color=("gray60", "gray45")).grid(
             row=1, column=0, sticky="ew", padx=16, pady=(0, 12)
         )
 
@@ -367,7 +367,7 @@ class ResultPanel(ctk.CTkFrame):
             text="Vorschau",
             font=ctk.CTkFont(size=13, weight="bold"),
             anchor="w",
-            text_color=("gray50", "gray55"),
+            text_color=("gray30", "gray70"),
         )
         self._title.grid(row=0, column=0, padx=16, pady=(12, 4), sticky="w")
 
@@ -377,7 +377,7 @@ class ResultPanel(ctk.CTkFrame):
             font=ctk.CTkFont(size=13, family="Courier"),
             justify="left",
             anchor="w",
-            text_color=("gray40", "gray60"),
+            text_color=("gray20", "gray75"),
         )
         self._body.grid(row=1, column=0, padx=16, pady=(0, 12), sticky="w")
 
