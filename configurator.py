@@ -1,7 +1,7 @@
 """
 Maß-Konfigurator
 ================
-Eingabe von Länge (L1), Breite (L2) und Höhe (h).
+Eingabe von Länge (L1), Breite (L2), Höhe (h) sowie Anzahl Füße L1/L2.
 Ausgabe: equations.txt
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -32,7 +32,7 @@ Klassen-Übersicht
   LabeledEntry       – wiederverwendbares Label+Eingabefeld-Widget
   Sidebar            – linke Navigationsleiste mit Logo
   HeaderFrame        – Titelleiste mit Header-Logo
-  InputCard          – Karte mit den drei Eingabefeldern
+  InputCard          – Karte mit den fünf Eingabefeldern
   ResultPanel        – zeigt Vorschau der erzeugten Datei
   ActionBar          – Speichern / Zurücksetzen-Buttons
   MassKonfigurator   – Hauptfenster, orchestriert alle Komponenten
@@ -67,7 +67,7 @@ CARD_BG      = ("#f0f0f8", "#2a2a3e")
 # ── Datei-Logik (kein UI) ────────────────────────────────────────────────────
 
 class EquationsExporter:
-    """Wandelt die drei Maß-Werte in den equations.txt-Inhalt um und speichert ihn.
+    """Wandelt die fünf Maß-Werte in den equations.txt-Inhalt um und speichert ihn.
 
     Enthält ausschließlich Geschäftslogik — vollständig unabhängig vom GUI-Framework.
     """
@@ -89,15 +89,36 @@ class EquationsExporter:
         return int(num) if num == int(num) else num
 
     @classmethod
-    def build_content(cls, l1: int | float, l2: int | float, h: int | float) -> str:
+    def build_content(
+        cls,
+        l1: int | float,
+        l2: int | float,
+        h: int | float,
+        anzahl_fuesse_l1: int | float,
+        anzahl_fuesse_l2: int | float,
+    ) -> str:
         """Erstellt den equations.txt-Dateiinhalt."""
-        return f'"L1"= {l1}\n"L2"= {l2}\n"h"= {h}\n'
+        return (
+            f'"L1"= {l1}\n'
+            f'"L2"= {l2}\n'
+            f'"h"= {h}\n'
+            f'"Anzahl Fuesse L1"= {anzahl_fuesse_l1}\n'
+            f'"Anzahl Fuesse L2"= {anzahl_fuesse_l2}\n'
+        )
 
     @classmethod
-    def save(cls, path: str, l1: int | float, l2: int | float, h: int | float) -> None:
+    def save(
+        cls,
+        path: str,
+        l1: int | float,
+        l2: int | float,
+        h: int | float,
+        anzahl_fuesse_l1: int | float,
+        anzahl_fuesse_l2: int | float,
+    ) -> None:
         """Schreibt den equations.txt-Inhalt in eine Datei."""
         with open(path, "w", encoding="utf-8") as f:
-            f.write(cls.build_content(l1, l2, h))
+            f.write(cls.build_content(l1, l2, h, anzahl_fuesse_l1, anzahl_fuesse_l2))
 
 
 # ── Logo-Helper ──────────────────────────────────────────────────────────────
@@ -304,7 +325,7 @@ class HeaderFrame(ctk.CTkFrame):
 
 
 class InputCard(ctk.CTkFrame):
-    """Karte mit den drei Eingabefeldern Länge, Breite und Höhe.
+    """Karte mit den fünf Eingabefeldern Länge, Breite, Höhe und Anzahl Füße L1/L2.
 
     Args:
         parent: Übergeordnetes Widget.
@@ -312,9 +333,11 @@ class InputCard(ctk.CTkFrame):
 
     # Feldkonfiguration: (Anzeigename, Einheit, Platzhalter, interner Schlüssel)
     _FIELDS = [
-        ("Länge  (L1)",  "mm", "z. B. 400", "l1"),
-        ("Breite  (L2)", "mm", "z. B. 800", "l2"),
-        ("Höhe  (h)",    "mm", "z. B. 100", "h"),
+        ("Länge  (L1)",        "mm", "z. B. 400", "l1"),
+        ("Breite  (L2)",       "mm", "z. B. 800", "l2"),
+        ("Höhe  (h)",          "mm", "z. B. 100", "h"),
+        ("Anz. Füße  (L1)",    "",   "3",          "anzahl_fuesse_l1"),
+        ("Anz. Füße  (L2)",    "",   "3",          "anzahl_fuesse_l2"),
     ]
 
     def __init__(self, parent):
@@ -442,8 +465,8 @@ class MassKonfigurator(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("📐  Maß-Konfigurator")
-        self.geometry("760x560")
-        self.minsize(680, 500)
+        self.geometry("760x700")
+        self.minsize(680, 640)
         self._set_icon()
         self._build_ui()
 
@@ -495,9 +518,11 @@ class MassKonfigurator(ctk.CTk):
         """Liest Eingaben, validiert sie und speichert die equations.txt."""
         raw = self._input_card.get_values()
         try:
-            l1 = EquationsExporter.parse_number(raw["l1"], "Länge (L1)")
-            l2 = EquationsExporter.parse_number(raw["l2"], "Breite (L2)")
-            h  = EquationsExporter.parse_number(raw["h"],  "Höhe (h)")
+            l1               = EquationsExporter.parse_number(raw["l1"],               "Länge (L1)")
+            l2               = EquationsExporter.parse_number(raw["l2"],               "Breite (L2)")
+            h                = EquationsExporter.parse_number(raw["h"],                "Höhe (h)")
+            anzahl_fuesse_l1 = EquationsExporter.parse_number(raw["anzahl_fuesse_l1"], "Anzahl Füße L1")
+            anzahl_fuesse_l2 = EquationsExporter.parse_number(raw["anzahl_fuesse_l2"], "Anzahl Füße L2")
         except ValueError as exc:
             messagebox.showerror("Eingabefehler", str(exc))
             return
@@ -511,9 +536,9 @@ class MassKonfigurator(ctk.CTk):
         if not path:
             return
 
-        EquationsExporter.save(path, l1, l2, h)
+        EquationsExporter.save(path, l1, l2, h, anzahl_fuesse_l1, anzahl_fuesse_l2)
 
-        content = EquationsExporter.build_content(l1, l2, h)
+        content = EquationsExporter.build_content(l1, l2, h, anzahl_fuesse_l1, anzahl_fuesse_l2)
         self._result_panel.update(os.path.basename(path), content)
         messagebox.showinfo("Gespeichert", f"✅  Datei gespeichert:\n{path}")
 
